@@ -51,6 +51,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IMockerRepository.cs" />
+    <Compile Include="Interfaces\IRequestProcessor.cs" />
     <Compile Include="MockResponse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
