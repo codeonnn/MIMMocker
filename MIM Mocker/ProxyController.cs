@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.SelfHost;
 using Titanium.Web.Proxy;
 using Titanium.Web.Proxy.EventArguments;
+using Titanium.Web.Proxy.Http;
 using Titanium.Web.Proxy.Models;
 
 
@@ -98,11 +101,26 @@ namespace MIM_Mocker
 
         public async Task OnRequest(object sender, SessionEventArgs e)
         {
+            var method = e.WebSession.Request.Method.ToUpper();
+            if ((method == "POST" || method == "PUT" || method == "PATCH"))
+            {
+                //Get/Set request body bytes
+                byte[] bodyBytes = await e.GetRequestBody();
+                await e.SetRequestBody(bodyBytes);
 
+                //Get/Set request body as string
+                string bodyString = await e.GetRequestBodyAsString();
+                await e.SetRequestBodyString(bodyString);
+
+            }
             RequestProcessor processor = new RequestProcessor();
             MockResponse response = await processor.ProcessAsync(e);
+            
             if (response != null)
+            {
+                //   await e.Respond(new Response() { ResponseStream = new MemoryStream(Encoding.UTF8.GetBytes(response.ResponseString ?? "")) });
                 await e.Ok(response.ResponseString);
+            }
 
         }
 
