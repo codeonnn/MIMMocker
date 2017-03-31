@@ -101,7 +101,8 @@ namespace MIM_Mocker
 
             RequestProcessor processor = new RequestProcessor();
             MockResponse response = await processor.ProcessAsync(e);
-         //   await e.Ok(response.ResponseString, response.Headers);
+            if (response != null)
+                await e.Ok(response.ResponseString);
 
         }
 

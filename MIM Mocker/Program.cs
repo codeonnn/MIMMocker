@@ -23,7 +23,7 @@ namespace MIM_Mocker
             Console.WriteLine();
             Console.Read();
 
-            Controller.Stop();
+            Controller.Stop().Wait();
         }
 
         private static bool ConsoleEventCallback(int eventType)

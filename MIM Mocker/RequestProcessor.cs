@@ -11,17 +11,21 @@ namespace MIM_Mocker
 {
     public class RequestProcessor : IRequestProcessor
     {
-        public async Task<MockResponse> ProcessAsync(SessionEventArgs rq)
+        public async Task<MockResponse> ProcessAsync(SessionEventArgs request)
         {
-            Dictionary<string, HttpHeader> dic = new Dictionary<string, HttpHeader>();
-            dic.Add("Content-Type", new HttpHeader("Content-Type", "application/json"));
-
-            MockResponse res = new MockResponse();
-            res.ResponseString = "{\"name\" : \"testname\"}";
-            res.Headers = dic;
-
-            return res;
+            var rules = await new Implementation.InMemoryRepository().GetRules();
+            var matchingRule = rules.Find(r => r.RequestUrl == request.WebSession.Request.Url);
+            if (matchingRule != null)
+            {
+                var response = new MockResponse()
+                {
+                    ResponseString = matchingRule.ResponseString
+                };
+                return await Task.FromResult(response);
+            }
+            return null;
         }
-
     }
+
 }
+

@@ -15,5 +15,6 @@ namespace MIMMocker.Common.Model
         public List<XPath> XPaths { get; set; }
         public Header MockIdentifier { get; set; }
         public TimeSpan Latency { get; set; }
+        public string ResponseString { get; set; }
     }
 }
