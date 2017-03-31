@@ -6,6 +6,7 @@ using Titanium.Web.Proxy;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Models;
 
+
 namespace MIM_Mocker
 {
     public class ProxyController
@@ -21,7 +22,7 @@ namespace MIM_Mocker
         public void StartProxy()
         {
             proxyServer.BeforeRequest += OnRequest;
-            proxyServer.BeforeResponse += OnResponse;
+            //proxyServer.BeforeResponse += OnResponse;
             proxyServer.ServerCertificateValidationCallback += OnCertificateValidation;
             proxyServer.ClientCertificateSelectionCallback += OnCertificateSelection;
 
@@ -71,7 +72,7 @@ namespace MIM_Mocker
         public void Stop()
         {
             proxyServer.BeforeRequest -= OnRequest;
-            proxyServer.BeforeResponse -= OnResponse;
+            //proxyServer.BeforeResponse -= OnResponse;
             proxyServer.ServerCertificateValidationCallback -= OnCertificateValidation;
             proxyServer.ClientCertificateSelectionCallback -= OnCertificateSelection;
 
@@ -82,19 +83,10 @@ namespace MIM_Mocker
         {
             if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("http://qa-data.oski.tavisca.com/data/api/v1.0/healthcheck"))
             {
-                await e.Ok("<!DOCTYPE html>" +
-                      "<html><body><h1>" +
-                      "Response from MIM Mocker" +
-                      "</h1>" +
-                      "<p>Blocked by ManInTheMiddle Mocker !</p>" +
-                      "</body>" +
-                      "</html>");
+                RequestProcessor processor = new RequestProcessor();
+                MockResponse response = await processor.ProcessAsync(e);
+                await e.Ok(response.ResponseString, response.Headers);
             }
-        }
-
-        public async Task OnResponse(object sender, SessionEventArgs e)
-        {
-
         }
 
         /// <summary>
