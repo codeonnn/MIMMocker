@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.SelfHost;
 using Titanium.Web.Proxy;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Models;
@@ -12,6 +14,7 @@ namespace MIM_Mocker
     public class ProxyController
     {
         private ProxyServer proxyServer;
+        private HttpSelfHostServer server;
 
         public ProxyController()
         {
@@ -19,8 +22,21 @@ namespace MIM_Mocker
             proxyServer.TrustRootCertificate = true;
         }
 
+        private void StartService()
+        {
+            var config = new HttpSelfHostConfiguration("http://localhost:8080");
+
+            config.Routes.MapHttpRoute(
+                "API Default", "api/{controller}/{id}",
+                new { id = RouteParameter.Optional });
+
+            server = new HttpSelfHostServer(config);
+
+            server.OpenAsync().Wait();
+        }
         public void StartProxy()
         {
+            StartService();
             proxyServer.BeforeRequest += OnRequest;
             //proxyServer.BeforeResponse += OnResponse;
             proxyServer.ServerCertificateValidationCallback += OnCertificateValidation;
@@ -69,8 +85,9 @@ namespace MIM_Mocker
             proxyServer.SetAsSystemHttpsProxy(explicitEndPoint);
         }
 
-        public void Stop()
+        public async Task Stop()
         {
+            await server.CloseAsync();
             proxyServer.BeforeRequest -= OnRequest;
             //proxyServer.BeforeResponse -= OnResponse;
             proxyServer.ServerCertificateValidationCallback -= OnCertificateValidation;
@@ -81,12 +98,11 @@ namespace MIM_Mocker
 
         public async Task OnRequest(object sender, SessionEventArgs e)
         {
-            if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("http://qa-data.oski.tavisca.com/data/api/v1.0/healthcheck"))
-            {
-                RequestProcessor processor = new RequestProcessor();
-                MockResponse response = await processor.ProcessAsync(e);
-                await e.Ok(response.ResponseString, response.Headers);
-            }
+
+            RequestProcessor processor = new RequestProcessor();
+            MockResponse response = await processor.ProcessAsync(e);
+         //   await e.Ok(response.ResponseString, response.Headers);
+
         }
 
         /// <summary>
