@@ -15,8 +15,14 @@ namespace MIM_Mocker
         {
             if (request.WebSession.Request.ContentLength > 0)
             {
-                string requestBody = await request.GetRequestBodyAsString();
-                var hashKey = SHAGenerator.GenerateSHA256String(requestBody);
+                string requestBodyMatch = null;
+
+                if (rule.XPaths != null && rule.XPaths.Count > 0)
+                    requestBodyMatch = XPathSelector.GetNodeStringByXpath(rule.XPaths[0].PathName, await request.GetRequestBodyAsString());
+                else
+                    requestBodyMatch = await request.GetRequestBodyAsString();
+
+                var hashKey = SHAGenerator.GenerateSHA256String(requestBodyMatch);
                 var response = await new Implementation.InMemoryRepository().GetResponse(hashKey);
                 if (response == null && request.WebSession.Response.ResponseStatusCode != null)
                 {
@@ -26,6 +32,8 @@ namespace MIM_Mocker
                     await new Implementation.InMemoryRepository().SaveResponse(hashKey, mockResponse, rule.TTL == default(TimeSpan) ? TimeSpan.FromHours(2) : rule.TTL);
                 }
                 return response;
+
+
             }
             return null;
 
