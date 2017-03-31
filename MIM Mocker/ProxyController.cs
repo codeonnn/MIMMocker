@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace MIM_Mocker
         {
             StartService();
             proxyServer.BeforeRequest += OnRequest;
-            //proxyServer.BeforeResponse += OnResponse;
+            proxyServer.BeforeResponse += OnResponse;
             proxyServer.ServerCertificateValidationCallback += OnCertificateValidation;
             proxyServer.ClientCertificateSelectionCallback += OnCertificateSelection;
 
@@ -92,11 +93,39 @@ namespace MIM_Mocker
         {
             await server.CloseAsync();
             proxyServer.BeforeRequest -= OnRequest;
-            //proxyServer.BeforeResponse -= OnResponse;
+            proxyServer.BeforeResponse -= OnResponse;
             proxyServer.ServerCertificateValidationCallback -= OnCertificateValidation;
             proxyServer.ClientCertificateSelectionCallback -= OnCertificateSelection;
 
             proxyServer.Stop();
+        }
+        public async Task OnResponse(object sender, SessionEventArgs e)
+        {
+            //read response headers
+            var responseHeaders = e.WebSession.Response.ResponseHeaders;
+            if (!responseHeaders.ContainsKey("IsMockResponse"))
+            {
+                RequestProcessor processor = new RequestProcessor();
+                MockResponse response = await processor.ProcessAsync(e);
+            }
+            // print out process id of current session
+            Console.WriteLine($"PID: {e.WebSession.ProcessId.Value}");
+
+            //if (!e.ProxySession.Request.Host.Equals("medeczane.sgk.gov.tr")) return;
+            if (e.WebSession.Request.Method == "GET" || e.WebSession.Request.Method == "POST")
+            {
+                if (e.WebSession.Response.ResponseStatusCode == "200")
+                {
+                    if (e.WebSession.Response.ContentType != null && e.WebSession.Response.ContentType.Trim().ToLower().Contains("text/html"))
+                    {
+                        byte[] bodyBytes = await e.GetResponseBody();
+                        await e.SetResponseBody(bodyBytes);
+
+                        string body = await e.GetResponseBodyAsString();
+                        await e.SetResponseBodyString(body);
+                    }
+                }
+            }
         }
 
         public async Task OnRequest(object sender, SessionEventArgs e)
@@ -115,11 +144,10 @@ namespace MIM_Mocker
             }
             RequestProcessor processor = new RequestProcessor();
             MockResponse response = await processor.ProcessAsync(e);
-            
+
             if (response != null)
             {
-                //   await e.Respond(new Response() { ResponseStream = new MemoryStream(Encoding.UTF8.GetBytes(response.ResponseString ?? "")) });
-                await e.Ok(response.ResponseString);
+                await e.Ok(response.ResponseString, response.Headers);
             }
 
         }

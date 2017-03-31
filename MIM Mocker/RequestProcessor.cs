@@ -17,11 +17,19 @@ namespace MIM_Mocker
             var matchingRule = rules.Find(r => r.RequestUrl == request.WebSession.Request.Url);
             if (matchingRule != null)
             {
-                var response = new MockResponse()
+                if (matchingRule.IsDynamic)
                 {
-                    ResponseString = matchingRule.ResponseString
-                };
-                return await Task.FromResult(response);
+                    return await new DynamicRequestProcessor().ProcessAsync(matchingRule, request);
+                }
+                else
+                {
+                    var response = new MockResponse()
+                    {
+                        ResponseString = matchingRule.ResponseString
+                    };
+                    response.Headers.Add("IsMockResponse", new HttpHeader("IsMockResponse", "true"));
+                    return await Task.FromResult(response);
+                }
             }
             return null;
         }

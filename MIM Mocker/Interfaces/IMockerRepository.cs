@@ -10,6 +10,7 @@ namespace MIM_Mocker
     public interface IMockerRepository
     {
         Task<string> SaveRules(RuleRequest ruleRequest);
-
+        Task SaveResponse(string hashCode, MockResponse response,TimeSpan expiryDuration);
+        Task<MockResponse> GetResponse(string hashCode);
     }
 }

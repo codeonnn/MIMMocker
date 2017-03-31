@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\SHAGenerator.cs" />
+    <Compile Include="Model\CachedResponse.cs" />
     <Compile Include="Model\Header.cs" />
     <Compile Include="Model\RuleRequest.cs" />
     <Compile Include="Model\XPath.cs" />
