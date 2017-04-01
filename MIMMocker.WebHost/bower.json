@@ -1,0 +1,27 @@
+{
+  "name": "h-mim-form",
+  "description": "input Form for ManInTheMiddleMocker",
+  "main": "h-mim-form.html",
+  "version": "0.0.0",
+  "authors": [
+    "Pravin Pimple <pravin4work@yahoo.com>",
+    "Kumar Waghmode <ganeshr43@gmail.com>",
+    "Ganesh Ratnaparkhi <ganeshr43@gmail.com>",
+    "Chetan Pimparkar <ganeshr43@gmail.com>",
+    "Mandar Mangaonkar <mangaonkar.mandar@gmail.com>"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.1.0",
+    "t-input": "atomelements/t-input#^1.0.0",
+    "t-radio-group": "atomelements/t-radio-group#^1.1.2",
+    "t-text-container": "travelnxtElements/t-text-container#^1.0.0",
+    "t-button": "atomelements/t-button#^1.2.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}

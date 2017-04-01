@@ -118,6 +118,10 @@
       <Project>{EC42EADA-D751-4158-BCE3-A5BB04AFFC8B}</Project>
       <Name>MIMMocker.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MIMMocker.WebHost\MIMMocker.WebHost.csproj">
+      <Project>{57840a04-7405-4690-883a-a85cc10d27c6}</Project>
+      <Name>MIMMocker.WebHost</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

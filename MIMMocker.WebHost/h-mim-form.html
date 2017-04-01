@@ -1,0 +1,340 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/t-input/t-input.html">
+<link rel="import" href="bower_components/t-button/t-button.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="bower_components/t-radio-group/t-radio-group.html" />
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html" />
+<link rel="import" href="bower_components/t-text-container/t-search-form-styles.html" />
+<link rel="import" href="theme.html" />
+<!--
+`h-mim-form`
+input Form for ManInTheMiddleMocker
+
+@demo demo/index.html 
+-->
+
+<dom-module id="h-mim-form">
+  <template>
+    <style include="t-search-form-styles"></style>
+    <style include="iron-flex">
+      [pill-button] ::content iron-selector {
+        width: 100%;
+        text-align: center;
+      }
+                  
+      ::content t-radio-button {
+        -ms-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+      }
+  
+    </style>
+    <div class="fieldset">
+      <div class="form flex">
+        <div class="row">
+          <span>Select request type</span>
+          <t-radio-group id="mockingType" 
+            name="mockingType"
+            data='["Static","Dynamic"]' 
+            pill-button
+            selected-item="{{mockingType}}">
+          </t-radio-group>
+        </div>
+        <div class="row">
+          <t-input value="{{mockRuleName}}" label="Mocking rule name*" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <t-input value="{{domainName}}" label="Add Domain*" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <t-input value="{{requestUrl}}" label="Add Request url*" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <template is="dom-repeat" items="[[requestHeaders]]">
+            <div class="layout horizontal">
+              <t-input class="flex" value="{{item.name}}" label="Add Request header*" prevent-invalid-input required></t-input>
+              <template is="dom-if" if="[[_isStatic]]">
+                <t-input class="flex" value="{{item.value}}" label="Add Request header value*" prevent-invalid-input required></t-input>
+              </template>
+              <template is="dom-if" if="[[index]]">
+                <span on-click="__removeHeader">X</span>
+              </template>
+            </div>
+          </template>
+          <t-button class="primary" on-click="__addHeaders" type="button" label="+Add Headers" /></t-button>
+        </div>
+        <div class="row">
+          <t-input value="{{requestBody}}" label="Request body*" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <span>Select request type</span>
+          <t-radio-group id="requestType" 
+            name="requestType"
+            data='["GET","POST","DELETE","PUT"]' 
+            pill-button
+            selected-item="{{requestType}}">
+          </t-radio-group>
+        </div>
+        <div class="row">
+          <span>Select format</span>
+          <t-radio-group id="contentType" 
+            name="contentType"
+            data='["x-path","json-path"]' 
+            pill-button
+            selected-item="{{_contentType}}">
+          </t-radio-group>
+          <template is="dom-if" if="[[_isXPath]]">
+            <template is="dom-repeat" items="[[xPath]]">
+              <div class="layout horizontal">
+                <t-input class="flex" value="{{item.name}}" label="Enter x-path*" required prevent-invalid-input></t-input>
+                <template is="dom-if" if="[[_isStatic]]">
+                  <t-input class="flex" value="{{item.value}}" label="Enter x-path value*" required prevent-invalid-input></t-input>
+                </template>
+                <template is="dom-if" if="[[index]]">
+                  <span on-click="__removeXPath">X</span>
+                </template>
+              </div>
+            </template>
+          </template>
+          <template is="dom-if" if="[[!_isXPath]]">
+            <template is="dom-repeat" items="[[jsonPath]]">
+              <div class="layout horizontal">
+                <t-input value="{{item.name}}" label="Enter json-path*" required prevent-invalid-input></t-input>
+                <template is="dom-if" if="[[_isStatic]]">
+                  <t-input class="flex" value="{{item.value}}" label="Enter json-path value*" required prevent-invalid-input></t-input>
+                </template>
+                <template is="dom-if" if="[[index]]">
+                  <span on-click="__removeJsonPath">X</span>
+                </template>
+              </div>
+            </template>
+          </template>
+          <t-button class="primary" on-click="__addFormatType" type="button" label="+Add" /></t-button>
+        </div>
+        <div class="row">
+          <t-input value="{{latency}}" label="Add latency" prevent-invalid-input></t-input>
+        </div>
+        <template is="dom-if" if="[[_isStatic]]">
+          <div class="row">
+            <t-input value="{{responseString}}" label="Add response" prevent-invalid-input required></t-input>
+          </div>
+        </template>
+        <t-button id="ruleSubmit" class="row primary" on-click="__submitRule" type="button" label="Save Rule" /></t-button>
+      </div>
+    </div>
+    <iron-ajax 
+      id="saveMockRule"
+      method="POST"
+      content-type="application/json"
+      url="localhost:8080/api/mock/saverule"
+      on-response="__onResponse"></iron-ajax>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'h-mim-form',
+
+      properties: {
+
+        mockRuleName: {
+          type: String,
+          value: ''
+        },
+
+        domainName: {
+          type: String,
+          value: ''
+        },
+
+        _contentType: {
+          type: String,
+          value: 'x-path'
+        },
+
+        _isXPath: {
+            type: Boolean,
+            computed: '__contentTypeChanged(_contentType)'
+        },
+
+        requestUrl: String,
+
+        requestBody: String,
+
+        /**
+         * This can be of POST, PUT, Delete
+         * @type {String}
+         */
+        requestType: String,
+
+        requestHeaders: {
+          type: Array,
+          value: function () {
+            return [{
+              name: '',
+              value: ''
+            }];
+          }
+        },
+
+        xPath: {
+          type: Array,
+          value: function () {
+            return [{
+              name: '',
+              value: ''
+            }];
+          }
+        },
+
+        jsonPath: {
+          type: Array,
+          value: function () {
+            return [{
+              name: '',
+              value: ''
+            }];
+          }
+        },
+
+        latency: {
+          type: String,
+          value: null
+        },
+
+        mockingType: {
+          type: String,
+          value: 'Static'
+        },
+
+        _isStatic: {
+            type: Boolean,
+            computed: '__mockingTypeChanged(mockingType)'
+        },
+
+        responseString: {
+          type: String,
+          value: ''
+        }
+      },
+
+      __contentTypeChanged: function (contentType) {
+        if (!contentType) {
+          return true;
+        }
+        var _isXPath = contentType == 'x-path' ? true : false;
+        return contentType == 'x-path' ? true : false;
+      },
+
+      __mockingTypeChanged: function (mockingType) {
+        if (!mockingType) {
+          return true;
+        }
+        return mockingType == 'Static' ? true : false;
+      },
+
+      __addFormatType: function () {
+        if (this._contentType == 'x-path') {
+          this.push('xPath', { name: '', value: ''});
+        } else {
+          this.push('jsonPath', { name: '', value: ''});
+        }
+      },
+
+      __removeXPath: function () {
+        this.pop('xPath');
+      },
+
+      __removeJsonPath: function () {
+        this.pop('jsonPath');
+      },
+
+      __addHeaders: function () {
+        this.push('requestHeaders', { name: '', value: ''});
+      },
+
+      __removeHeader: function () {
+        this.pop('requestHeaders');
+      },
+
+      __submitRule: function () {
+        if (this._isXPath) {
+          this.jsonPath = [];
+        } else {
+          this.xPath = [];
+        }
+        
+        if (!this._validate()) {
+          return;
+        }
+
+        //ajax call
+        var requestObj = {
+          Domain: this.domainName,
+          RequestUrl: this.requestUrl,
+          RequestType: this.requestType,
+          Headers: [],
+          XPaths:[],
+          JPaths: [],
+          Latency: this.latency,
+          IsDynamic: this.mockingType == 'Static' ? false : true,
+          ResponseString: this.responseString
+        }
+        requestObj.Headers = this._getHeaders();
+        requestObj.XPaths = this._getXPaths();
+        requestObj.JPaths = this._getJPaths();
+        this.$.saveMockRule.generateRequest();
+      },
+
+      __onResponse: function () {
+        console.log(arguments);
+        debugger
+      },
+
+      _getHeaders: function () {
+        var retArr = [];
+        for (var i = 0; i < this.requestHeaders.length; i++) {
+          var obj = {
+            Name: this.requestHeaders[i].name,
+            Value: this.requestHeaders[i].value
+          }
+          retArr.push(obj);
+        }
+        return retArr;
+      },
+
+      _getXPaths: function () {
+        var retArr = [];
+        for (var i = 0; i < this.xPath.length; i++) {
+          var obj = {
+            Name: this.xPath[i].name,
+            Value: this.xPath[i].value
+          }
+          retArr.push(obj);
+        }
+        return retArr;
+      },
+
+      _getJPaths: function () {
+        var retArr = [];
+        for (var i = 0; i < this.jsonPath.length; i++) {
+          var obj = {
+            Name: this.jsonPath[i].name,
+            Value: this.jsonPath[i].value
+          }
+          retArr.push(obj);
+        }
+        return retArr;
+      },
+
+      _validate: function () {
+        var all = Polymer.dom(this.root).querySelectorAll('[required]'),
+        isValid = true;
+        all.forEach(function (element, index) {
+          isValid = element.validate() && isValid;
+        });
+        return isValid;
+      }
+    });
+  </script>
+</dom-module>
