@@ -35,6 +35,8 @@ namespace MIM_Mocker
                     {
                         HttpResponseMessage response = task.Result;
                         response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        response.Headers.Add("Access-Control-Allow-Headers", "*");
+                        response.Headers.Add("Access-Control-Allow-Methods", "*");
                         return response;
                     });
             }

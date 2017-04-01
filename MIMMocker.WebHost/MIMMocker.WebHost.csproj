@@ -183,6 +183,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="h-mim-form.html" />
     <Content Include="index.html" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="theme.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -199,7 +200,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Scripts\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
