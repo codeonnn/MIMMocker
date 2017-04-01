@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIM Mocker", "MIM Mocker\MI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIMMocker.Common", "MIMMocker.Common\MIMMocker.Common.csproj", "{EC42EADA-D751-4158-BCE3-A5BB04AFFC8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jsontree", "Jsontree\Jsontree.csproj", "{CA107E00-7C50-48C9-A0A0-43B6D48C253E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EC42EADA-D751-4158-BCE3-A5BB04AFFC8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC42EADA-D751-4158-BCE3-A5BB04AFFC8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC42EADA-D751-4158-BCE3-A5BB04AFFC8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA107E00-7C50-48C9-A0A0-43B6D48C253E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA107E00-7C50-48C9-A0A0-43B6D48C253E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA107E00-7C50-48C9-A0A0-43B6D48C253E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA107E00-7C50-48C9-A0A0-43B6D48C253E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
