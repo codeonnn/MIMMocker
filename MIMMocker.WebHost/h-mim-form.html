@@ -67,20 +67,20 @@ input Form for ManInTheMiddleMocker
           <t-input value="{{mockRuleName}}" label="Mocking rule name*" prevent-invalid-input required></t-input>
         </div>
         <div class="row">
-          <t-input value="{{origin}}" label="Add Origin*" prevent-invalid-input required></t-input>
+          <t-input value="{{origin}}" label="Add Origin" prevent-invalid-input></t-input>
         </div>
         <div class="row">
-          <t-input value="{{domainName}}" label="Add Domain*" prevent-invalid-input required></t-input>
+          <t-input value="{{domainName}}" label="Add Domain" prevent-invalid-input></t-input>
         </div>
         <div class="row">
-          <t-input value="{{requestUrl}}" label="Add Request url*" prevent-invalid-input required></t-input>
+          <t-input value="{{requestUrl}}" label="Add Request url" prevent-invalid-input required></t-input>
         </div>
         <div class="row">
           <template is="dom-repeat" items="[[requestHeaders]]">
             <div class="layout horizontal">
-              <t-input class="flex" value="{{item.name}}" label="Add Request header*" prevent-invalid-input required></t-input>
+              <t-input class="flex" value="{{item.name}}" label="Add Request header" prevent-invalid-input></t-input>
               <template is="dom-if" if="[[_isStatic]]">
-                <t-input class="flex" value="{{item.value}}" label="Add Request header value*" prevent-invalid-input required></t-input>
+                <t-input class="flex" value="{{item.value}}" label="Add Request header value" prevent-invalid-input></t-input>
               </template>
               <template is="dom-if" if="[[index]]">
                 <span on-click="__removeHeader">X</span>
@@ -90,7 +90,7 @@ input Form for ManInTheMiddleMocker
           <t-button class="primary mtm color-white" on-click="__addHeaders" type="button" label="+Add Headers" /></t-button>
         </div>
         <div class="row">
-          <t-input value="{{requestBody}}" label="Request body*" prevent-invalid-input required></t-input>
+          <t-input value="{{requestBody}}" label="Request body" prevent-invalid-input></t-input>
         </div>
         <div class="row">
           <span>Select request type</span>
@@ -112,9 +112,9 @@ input Form for ManInTheMiddleMocker
           <template is="dom-if" if="[[_isXPath]]">
             <template is="dom-repeat" items="[[xPath]]">
               <div class="layout horizontal">
-                <t-input class="flex" value="{{item.name}}" label="Enter x-path*" required prevent-invalid-input></t-input>
+                <t-input class="flex" value="{{item.name}}" label="Enter x-path" prevent-invalid-input></t-input>
                 <template is="dom-if" if="[[_isStatic]]">
-                  <t-input class="flex" value="{{item.value}}" label="Enter x-path value*" required prevent-invalid-input></t-input>
+                  <t-input class="flex" value="{{item.value}}" label="Enter x-path value" prevent-invalid-input></t-input>
                 </template>
                 <template is="dom-if" if="[[index]]">
                   <span on-click="__removeXPath">X</span>
@@ -125,9 +125,9 @@ input Form for ManInTheMiddleMocker
           <template is="dom-if" if="[[!_isXPath]]">
             <template is="dom-repeat" items="[[jsonPath]]">
               <div class="layout horizontal">
-                <t-input value="{{item.name}}" label="Enter json-path*" required prevent-invalid-input></t-input>
+                <t-input value="{{item.name}}" label="Enter json-path" prevent-invalid-input></t-input>
                 <template is="dom-if" if="[[_isStatic]]">
-                  <t-input class="flex" value="{{item.value}}" label="Enter json-path value*" required prevent-invalid-input></t-input>
+                  <t-input class="flex" value="{{item.value}}" label="Enter json-path value" prevent-invalid-input></t-input>
                 </template>
                 <template is="dom-if" if="[[index]]">
                   <span on-click="__removeJsonPath">X</span>
@@ -142,12 +142,12 @@ input Form for ManInTheMiddleMocker
         </div>
         <template is="dom-if" if="[[_isStatic]]">
           <div class="row">
-            <t-input value="{{responseString}}" label="Add response" prevent-invalid-input required></t-input>
+            <t-input value="{{responseString}}" label="Add response" prevent-invalid-input></t-input>
           </div>
         </template>
         <template is="dom-if" if="[[!_isStatic]]">
           <div class="row">
-            <t-input value="{{timeToLive}}" label="Time to live" prevent-invalid-input required></t-input>
+            <t-input value="{{timeToLive}}" label="Time to live" prevent-invalid-input></t-input>
           </div>
         </template>
         <t-button id="ruleSubmit" class="row primary color-white" on-click="__submitRule" type="button" label="Save Rule"></t-button>
@@ -337,8 +337,8 @@ input Form for ManInTheMiddleMocker
         }
 
          $.ajax({
-          type: 'POST',
-          url: "http://localhost:8080/api/mock/saverule",
+             type: 'POST',
+          url: "http://localhost:8082/api/mock/SaveRule",
           data: JSON.stringify(requestObj),
           success: $.proxy(this._onResponse),
           error: $.proxy(this._onResponseError)
