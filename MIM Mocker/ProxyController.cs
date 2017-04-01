@@ -41,7 +41,7 @@ namespace MIM_Mocker
         }
         private void StartService()
         {
-            var config = new HttpSelfHostConfiguration("http://localhost:8080");
+            var config = new HttpSelfHostConfiguration("http://localhost:8082");
             config.MessageHandlers.Add(new CustomHeaderHandler());
             config.Routes.MapHttpRoute(
                 "API Default", "api/{controller}/{id}",
@@ -121,8 +121,8 @@ namespace MIM_Mocker
                 RequestProcessor processor = new RequestProcessor();
                 MockResponse response = await processor.ProcessAsync(e);
             }
-            // print out process id of current session
-            Console.WriteLine($"PID: {e.WebSession.ProcessId.Value}");
+            else
+                Console.WriteLine($"Url: {e.WebSession.Request.Url}");
 
             //if (!e.ProxySession.Request.Host.Equals("medeczane.sgk.gov.tr")) return;
             if (e.WebSession.Request.Method == "GET" || e.WebSession.Request.Method == "POST")

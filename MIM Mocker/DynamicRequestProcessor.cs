@@ -43,6 +43,8 @@ namespace MIM_Mocker
                     mockResponse.Headers = request.WebSession.Response.ResponseHeaders;
                     await new Implementation.InMemoryRepository().SaveResponse(hashKey, mockResponse, rule.TTL == default(TimeSpan) ? TimeSpan.FromHours(2) : rule.TTL);
                 }
+                else if (response != null && !response.Headers.ContainsKey("IsMockResponse"))
+                    response.Headers.Add("IsMockResponse", new HttpHeader("IsMockResponse", "true"));
                 return response;
 
 

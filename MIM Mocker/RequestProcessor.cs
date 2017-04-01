@@ -15,6 +15,8 @@ namespace MIM_Mocker
         {
             var rules = await new Implementation.InMemoryRepository().GetRules();
             var matchingRule = rules.Find(r => r.RequestUrl == request.WebSession.Request.Url);
+            if (matchingRule == null)
+                matchingRule = rules.Find(r => request.WebSession.Request.Url.Contains(r.RequestUrl));
             if (matchingRule != null)
             {
                 if (matchingRule.IsDynamic)
