@@ -5,7 +5,9 @@
 <link rel="import" href="bower_components/t-radio-group/t-radio-group.html" />
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="bower_components/t-text-container/t-search-form-styles.html" />
+<link rel="import" href="bower_components/t-sessionstorage/t-sessionstorage.html">
 <link rel="import" href="theme.html" />
+<link rel="import" href="session-store-behavior.html" />
 <!--
 `h-mim-form`
 input Form for ManInTheMiddleMocker
@@ -27,7 +29,28 @@ input Form for ManInTheMiddleMocker
         -webkit-flex: 1;
         flex: 1;
       }
-  
+
+      :host .mtl {
+        margin-top: 20px;
+      }
+      :host .mtm {
+        margin-top: 10px;
+      }
+      :host .color-white {
+        color: white;
+      }
+      :host .color-red {
+        color: red;
+      }
+      :host .color-green {
+        color: green;
+      }
+      :host .t-radiobutton {
+        color: ;
+      }
+      #radioLabel {
+        color: var(--form-value-color, #000);
+      }
     </style>
     <div class="fieldset">
       <div class="form flex">
@@ -64,7 +87,7 @@ input Form for ManInTheMiddleMocker
               </template>
             </div>
           </template>
-          <t-button class="primary" on-click="__addHeaders" type="button" label="+Add Headers" /></t-button>
+          <t-button class="primary mtm color-white" on-click="__addHeaders" type="button" label="+Add Headers" /></t-button>
         </div>
         <div class="row">
           <t-input value="{{requestBody}}" label="Request body*" prevent-invalid-input required></t-input>
@@ -112,7 +135,7 @@ input Form for ManInTheMiddleMocker
               </div>
             </template>
           </template>
-          <t-button class="primary" on-click="__addFormatType" type="button" label="+Add" /></t-button>
+          <t-button class="primary color-white mtm" on-click="__addFormatType" type="button" label="+Add" /></t-button>
         </div>
         <div class="row">
           <t-input value="{{latency}}" label="Add latency" prevent-invalid-input></t-input>
@@ -122,15 +145,21 @@ input Form for ManInTheMiddleMocker
             <t-input value="{{responseString}}" label="Add response" prevent-invalid-input required></t-input>
           </div>
         </template>
-        <t-button id="ruleSubmit" class="row primary" on-click="__submitRule" type="button" label="Save Rule" /></t-button>
+        <template is="dom-if" if="[[!_isStatic]]">
+          <div class="row">
+            <t-input value="{{timeToLive}}" label="Time to live" prevent-invalid-input required></t-input>
+          </div>
+        </template>
+        <t-button id="ruleSubmit" class="row primary color-white" on-click="__submitRule" type="button" label="Save Rule"></t-button>
+        <span id="success" class="color-green hide" >Rule saved successfully!</span>
+        <span id="error" class="color-red hide">There is an error while saving the rule. Please try again later.</span>
       </div>
     </div>
-    <iron-ajax 
-      id="saveMockRule"
-      method="POST"
-      content-type="application/json"
-      url="http://localhost:8080/api/mock/saverule"
-      on-response="__onResponse"></iron-ajax>
+      <t-sessionstorage id="sessionStore"
+        api-url-format="[[apiUrlFormat]]"
+        on-t-sessionstorage-load-success="_onSessionLoad"
+        on-t-sessionstorage-save-success="_onSessionSave">
+      </t-sessionstorage>
   </template>
 
   <script>
@@ -223,6 +252,21 @@ input Form for ManInTheMiddleMocker
         responseString: {
           type: String,
           value: ''
+        },
+
+        timeToLive: {
+          type: String,
+          value: ''
+        },
+
+        onSaveSuccess: {
+          type: Boolean,
+          value: false
+        },
+
+        onSaveError: {
+          type: Boolean,
+          value: false
         }
       },
 
@@ -289,20 +333,15 @@ input Form for ManInTheMiddleMocker
           Latency: this.latency,
           IsDynamic: this.mockingType == 'Static' ? false : true,
           ResponseString: this.responseString,
-          TTL: 2
+          TTL: this.timeToLive
         }
 
          $.ajax({
           type: 'POST',
           url: "http://localhost:8080/api/mock/saverule",
           data: JSON.stringify(requestObj),
-          success: function(resultData) {
-            this._onResponse(resultData);
-          },
-          error: function () {
-            console.log(arguments);
-            debugger
-          }
+          success: $.proxy(this._onResponse),
+          error: $.proxy(this._onResponseError)
         });
 
         // requestObj.Headers = this._getHeaders();
@@ -313,8 +352,17 @@ input Form for ManInTheMiddleMocker
       },
 
       _onResponse: function () {
-        console.log(arguments);
-        debugger
+        $("#success").show();
+        setTimeout(function () {
+          $("#success").hide();
+        }, 10000);
+      },
+
+      _onResponseError: function () {
+        $("#error").show();
+        setTimeout(function () {
+          $("#error").hide();
+        }, 10000);
       },
 
       _getHeaders: function () {
