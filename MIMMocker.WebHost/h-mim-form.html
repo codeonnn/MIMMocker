@@ -44,6 +44,9 @@ input Form for ManInTheMiddleMocker
           <t-input value="{{mockRuleName}}" label="Mocking rule name*" prevent-invalid-input required></t-input>
         </div>
         <div class="row">
+          <t-input value="{{origin}}" label="Add Origin*" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
           <t-input value="{{domainName}}" label="Add Domain*" prevent-invalid-input required></t-input>
         </div>
         <div class="row">
@@ -126,7 +129,7 @@ input Form for ManInTheMiddleMocker
       id="saveMockRule"
       method="POST"
       content-type="application/json"
-      url="localhost:8080/api/mock/saverule"
+      url="http://localhost:8080/api/mock/saverule"
       on-response="__onResponse"></iron-ajax>
   </template>
 
@@ -136,6 +139,11 @@ input Form for ManInTheMiddleMocker
       is: 'h-mim-form',
 
       properties: {
+
+        origin: {
+          type: String,
+          value: ''
+        },
 
         mockRuleName: {
           type: String,
@@ -270,23 +278,41 @@ input Form for ManInTheMiddleMocker
 
         //ajax call
         var requestObj = {
+          Origin: this.origin,
           Domain: this.domainName,
           RequestUrl: this.requestUrl,
           RequestType: this.requestType,
           Headers: [],
           XPaths:[],
           JPaths: [],
+          MockIdentifier: null,
           Latency: this.latency,
           IsDynamic: this.mockingType == 'Static' ? false : true,
-          ResponseString: this.responseString
+          ResponseString: this.responseString,
+          TTL: 2
         }
-        requestObj.Headers = this._getHeaders();
-        requestObj.XPaths = this._getXPaths();
-        requestObj.JPaths = this._getJPaths();
-        this.$.saveMockRule.generateRequest();
+
+         $.ajax({
+          type: 'POST',
+          url: "http://localhost:8080/api/mock/saverule",
+          data: JSON.stringify(requestObj),
+          success: function(resultData) {
+            this._onResponse(resultData);
+          },
+          error: function () {
+            console.log(arguments);
+            debugger
+          }
+        });
+
+        // requestObj.Headers = this._getHeaders();
+        // requestObj.XPaths = this._getXPaths();
+        // requestObj.JPaths = this._getJPaths();
+        // this.$.saveMockRule.body = JSON.stringify(requestObj);
+        // this.$.saveMockRule.generateRequest();
       },
 
-      __onResponse: function () {
+      _onResponse: function () {
         console.log(arguments);
         debugger
       },
@@ -307,7 +333,7 @@ input Form for ManInTheMiddleMocker
         var retArr = [];
         for (var i = 0; i < this.xPath.length; i++) {
           var obj = {
-            Name: this.xPath[i].name,
+            PathName: this.xPath[i].name,
             Value: this.xPath[i].value
           }
           retArr.push(obj);
@@ -319,7 +345,7 @@ input Form for ManInTheMiddleMocker
         var retArr = [];
         for (var i = 0; i < this.jsonPath.length; i++) {
           var obj = {
-            Name: this.jsonPath[i].name,
+            PathName: this.jsonPath[i].name,
             Value: this.jsonPath[i].value
           }
           retArr.push(obj);
