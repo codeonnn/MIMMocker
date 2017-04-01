@@ -28,6 +28,11 @@ namespace MIM_Mocker
                         ResponseString = matchingRule.ResponseString
                     };
                     response.Headers.Add("IsMockResponse", new HttpHeader("IsMockResponse", "true"));
+                    if (response != null)
+                    {
+                        if (matchingRule.Latency != default(TimeSpan))
+                            await Task.Delay(matchingRule.Latency);
+                    }
                     return await Task.FromResult(response);
                 }
             }

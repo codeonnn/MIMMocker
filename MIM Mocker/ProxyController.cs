@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -25,11 +26,23 @@ namespace MIM_Mocker
             proxyServer = new ProxyServer();
             proxyServer.TrustRootCertificate = true;
         }
-
+        public class CustomHeaderHandler : DelegatingHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+            {
+                return base.SendAsync(request, cancellationToken)
+                    .ContinueWith((task) =>
+                    {
+                        HttpResponseMessage response = task.Result;
+                        response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        return response;
+                    });
+            }
+        }
         private void StartService()
         {
             var config = new HttpSelfHostConfiguration("http://localhost:8080");
-
+            config.MessageHandlers.Add(new CustomHeaderHandler());
             config.Routes.MapHttpRoute(
                 "API Default", "api/{controller}/{id}",
                 new { id = RouteParameter.Optional });
@@ -130,6 +143,8 @@ namespace MIM_Mocker
 
         public async Task OnRequest(object sender, SessionEventArgs e)
         {
+            HttpHeader header;
+            var origin = e.WebSession.Request.RequestHeaders.TryGetValue("origin", out header);
             var method = e.WebSession.Request.Method.ToUpper();
             if ((method == "POST" || method == "PUT" || method == "PATCH"))
             {

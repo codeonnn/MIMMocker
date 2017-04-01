@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
+using Titanium.Web.Proxy.Models;
 
 namespace MIM_Mocker
 {
@@ -24,7 +25,15 @@ namespace MIM_Mocker
                     requestBodyMatch = XPathSelector.GetNodeStringByXpath(rule.XPaths, await request.GetRequestBodyAsString());
                 else
                     requestBodyMatch = await request.GetRequestBodyAsString();
-
+                if (rule.Headers != null && rule.Headers.Count > 0)
+                {
+                    rule.Headers.ForEach(h =>
+                    {
+                        HttpHeader header;
+                        if (request.WebSession.Request.RequestHeaders.TryGetValue(h.Name, out header))
+                            requestBodyMatch += header.Value;
+                    });
+                }
                 var hashKey = SHAGenerator.GenerateSHA256String(requestBodyMatch);
                 var response = await new Implementation.InMemoryRepository().GetResponse(hashKey);
                 if (response == null && request.WebSession.Response.ResponseStatusCode != null)
@@ -43,3 +52,4 @@ namespace MIM_Mocker
         }
     }
 }
+

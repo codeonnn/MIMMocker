@@ -21,5 +21,6 @@ namespace MIMMocker.Common.Helpers
             }
             return stringBuilder.ToString();
         }
+        
     }
 }
