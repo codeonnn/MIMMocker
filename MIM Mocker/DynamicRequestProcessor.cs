@@ -17,8 +17,11 @@ namespace MIM_Mocker
             {
                 string requestBodyMatch = null;
 
-                if (rule.XPaths != null && rule.XPaths.Count > 0)
-                    requestBodyMatch = XPathSelector.GetNodeStringByXpath(rule.XPaths[0].PathName, await request.GetRequestBodyAsString());
+                if (request.WebSession.Request.ContentType.ToLower() == "application/json" && rule.JPaths != null && rule.JPaths.Count > 0)
+                    requestBodyMatch = JPathSelector.GetNodeStringByJpath(rule.JPaths, await request.GetRequestBodyAsString());
+
+                else if (request.WebSession.Request.ContentType.ToLower() == "application/xml" && rule.JPaths != null && rule.JPaths.Count > 0)
+                    requestBodyMatch = XPathSelector.GetNodeStringByXpath(rule.XPaths, await request.GetRequestBodyAsString());
                 else
                     requestBodyMatch = await request.GetRequestBodyAsString();
 

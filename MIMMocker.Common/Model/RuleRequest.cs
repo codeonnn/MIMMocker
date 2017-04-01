@@ -13,6 +13,7 @@ namespace MIMMocker.Common.Model
         public string RequestType { get; set; }
         public List<Header> Headers { get; set; }
         public List<XPath> XPaths { get; set; }
+        public List<XPath> JPaths { get; set; }
         public Header MockIdentifier { get; set; }
         public TimeSpan Latency { get; set; }
         public bool IsDynamic { get; set; }
