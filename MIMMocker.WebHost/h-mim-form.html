@@ -1,0 +1,169 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/t-input/t-input.html">
+<link rel="import" href="bower_components/t-button/t-button.html">
+<link rel="import" href="bower_components/t-radio-group/t-radio-group.html" />
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html" />
+<link rel="import" href="bower_components/t-text-container/t-search-form-styles.html" />
+<link rel="import" href="theme.html" />
+<!--
+`h-mim-form`
+input Form for ManInTheMiddleMocker
+
+@demo demo/index.html 
+-->
+
+<dom-module id="h-mim-form">
+  <template>
+    <style include="t-search-form-styles"></style>
+    <style include="iron-flex">
+      [pill-button] ::content iron-selector {
+        width: 100%;
+        text-align: center;
+      }
+                  
+      ::content t-radio-button {
+        -ms-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+      }
+  
+    </style>
+    <div class="fieldset">
+      <div class="form flex">
+        <div class="row">
+          <t-input value="{{mockRuleName}}" label="Mocking rule name" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <t-input value="{{domainName}}" label="Domain" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <t-input value="{{requestUrl}}" label="Request url" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <t-input value="{{requestHeaders}}" label="Request header" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <t-input value="{{requestBody}}" label="Request body" prevent-invalid-input required></t-input>
+        </div>
+        <div class="row">
+          <span>Select request type</span>
+          <t-radio-group id="requestType" 
+            name="requestType"
+            data='["GET","POST","DELETE","PUT"]' 
+            pill-button
+            selected-item="{{requestType}}">
+          </t-radio-group>
+        </div>
+        <div class="row">
+          <span>Select format</span>
+          <t-radio-group id="contentType" 
+            name="contentType"
+            data='["x-path","json-path"]' 
+            pill-button
+            selected-item="{{_contentType}}">
+          </t-radio-group>
+          <template is="dom-if" if="[[_isXPath]]">
+            <template is="dom-repeat" items="[[xPath]]">
+              <t-input value="{{item}}" label="Enter x-path" prevent-invalid-input></t-input>
+            </template>
+          </template>
+          <template is="dom-if" if="[[!_isXPath]]">
+            <template is="dom-repeat" items="[[jsonPath]]">
+              <t-input value="{{item}}" label="Enter json-path" prevent-invalid-input></t-input>
+              </template>
+          </template>
+          <t-button class="primary" on-click="_addFormatType" type="button" label="+Add" /></t-button>
+        </div>
+        <t-button id="ruleSubmit" class="row primary" on-click="_submitRule" type="button" label="Save Rule" /></t-button>
+      </div>
+    </div>
+    <iron-ajax 
+      id="setSessionData"
+      method="POST"
+      content-type="application/json"
+      url=""
+      on-response="_onResponse"></iron-ajax>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'h-mim-form',
+
+      properties: {
+
+        mockRuleName: {
+          type: String,
+          value: ''
+        },
+
+        domainName: {
+          type: String,
+          value: ''
+        },
+
+        _contentType: {
+          type: String,
+          value: 'x-path'
+        },
+
+        _isXPath: {
+            type: Boolean,
+            computed: '_contentTypeChanged(_contentType)'
+        },
+
+        requestUrl: String,
+
+        requestBody: String,
+
+        /**
+         * This can be of POST, PUT, Delete
+         * @type {String}
+         */
+        requestType: String,
+
+        requestHeaders: String,
+
+        xPath: {
+          type: Array,
+          value: function () {
+            return [''];
+          }
+        },
+
+        jsonPath: {
+          type: Array,
+          value: function () {
+            return [''];
+          }
+        },
+      },
+
+      _contentTypeChanged: function (contentType) {
+        if (!contentType) {
+          return true;
+        }
+        return contentType == 'x-path' ? true : false;
+      },
+
+      _addFormatType: function () {
+        if (this._contentType == 'x-path') {
+          this.push('xPath', '');
+        } else {
+          this.push('jsonPath', '');
+        }
+      },
+
+      _submitRule: function () {
+        console.log(arguments);
+        debugger
+      },
+
+      _onResponse: function () {
+        console.log(arguments);
+        debugger
+      }
+
+    });
+  </script>
+</dom-module>
